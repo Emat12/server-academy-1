@@ -1,2 +1,2 @@
-# server-academy
-Preparation for Dar es Salaam server academy and resulting docs
+# server-academy-buildenv
+Build environment with Ansible and Vagrant 

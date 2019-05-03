@@ -1,0 +1,1 @@
+{"rsync":{"/home/vagrant/setup":{"type":"rsync","guestpath":"/home/vagrant/setup","hostpath":"/home/vagrant/server-academy-buildenv/Linode/setup","disabled":false,"__vagrantfile":true,"owner":"vagrant","group":"vagrant"}}}

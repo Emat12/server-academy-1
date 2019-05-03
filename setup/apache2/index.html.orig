@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!--#set var="Ent-Title" value="{ENTTITLE}" -->
+<!--#set var="EntHead1" value="{ENTHEAD1}" -->
+<!--#set var="EntHead2" value="{ENTHEAD2}" -->
+
+<!--#set var="EntLLogo" value="dhis2.jpg" -->
+<!--#set var="EntLinkText" value="Service Link" -->
+
+<!--#set var="EntInst1Title" value="DHIS2 Instance" -->
+<!--#set var="EntInst1Note" value="An instance of DHIS2 running on the 'tomcat' lxc" -->
+<!--#set var="EntInst1Path" value="/dhis" -->
+
+<!--#set var="EntInst2Title" value="Munin Monitoring" -->
+<!--#set var="EntInst2Note" value="Munin Software on the 'monitor' lxc" -->
+<!--#set var="EntInst2Path" value="/munin" -->
+
+<html class="loginPage">
+<HEAD>
+<TITLE><!--#echo var="Ent-Title" --></TITLE>
+<style>
+.button {
+  font: bold 11px Arial;
+  text-decoration: none;
+  background-color: #EEEEEE;
+  color: #333333;
+  padding: 2px 6px 2px 6px;
+  border-top: 1px solid #CCCCCC;
+  border-right: 1px solid #333333;
+  border-bottom: 1px solid #333333;
+  border-left: 1px solid #CCCCCC;
+}
+</style>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<!--#include virtual="/favicon/include.html" -->
+
+</HEAD>
+<BODY BGCOLOR="WHITE">
+<table width="90%" border="0"><tr><td width="290"><img src="<!--#echo var="EntLLogo" -->" width="196" ></td>
+<td valign="top"><div style="font-family: serif; font-size: 150%;"><!--#echo var="EntHead1" --><br/>
+</div>
+<div style="font-family: serif; font-size: 150%; color: green;"><!--#echo var="EntHead2" --></div>
+</td>
+<td><img height="99" width="196" src="dhis2.jpg"></td>
+</tr>
+</table>
+<hr/><code>
+<B>Hostname of this server...:</B>  <!--#echo var="HTTP_HOST" --><br/>
+<B>Your IP Address is........:</B>  <!--#echo var="REMOTE_ADDR" --><br/>
+</code><hr/>
+<div style="font-family: Tahoma, Geneva, sans-serif; font-size: 110%; font-weight:bold">Systems and Services Accessible Here:</div>
+<br/>
+<table width="90%" border="0" style="font-family: Tahoma, Geneva, sans-serif; text-align:left;"><tr>
+<td width="50%" valign="top"><b><u>System</u></b><br/></td><td width="50%" valign="top"><b><u>Access Method</u></b><br/><br/></td></tr>
+
+<!--#if expr="-n v('EntInst1Title')" -->
+<tr>
+<td><strong><!--#echo var="EntInst1Title" --></strong><br/>
+<!--#echo var="EntInst1Note" --> <code>[<!--#echo var="EntInst1Path" -->]</code><br/><br/></td>
+<td valign="top"><a class="button" href="<!--#echo var="EntInst1Path" -->"><!--#echo var="EntLinkText" --></a></td>
+</tr>
+<!--#endif-->
+
+<!--#if expr="-n v('EntInst2Title')" -->
+<tr>
+<td><strong><!--#echo var="EntInst2Title" --></strong><br/>
+<!--#echo var="EntInst2Note" --> <code>[<!--#echo var="EntInst2Path" -->]</code><br/><br/></td>
+<td valign="top"><a class="button" href="<!--#echo var="EntInst2Path" -->"><!--#echo var="EntLinkText" --></a></td>
+</tr>
+<!--#endif-->
+
+<!--#if expr="-n v('EntInst2bTitle')" -->
+<tr>
+<td><strong><!--#echo var="EntInst2bTitle" --></strong><br/>
+<!--#echo var="EntInst2bNote" --> <code>[<!--#echo var="EntInst2bPath" -->]</code><br/><br/></td>
+<td valign="top"><a class="button" href="<!--#echo var="EntInst2bPath" -->"><!--#echo var="EntLinkText" --></a></td>
+</tr>
+<!--#endif-->
+
+<!--#if expr="-n v('EntInst3Title')" -->
+<tr>
+<td><strong><!--#echo var="EntInst3Title" --></strong><br/>
+<!--#echo var="EntInst3Note" --> <code>[<!--#echo var="EntInst3Path" -->]</code><br/><br/></td>
+<td valign="top"><a class="button" href="<!--#echo var="EntInst3Path" -->"><!--#echo var="EntLinkText" --></a></td>
+</tr>
+<!--#endif-->
+
+<!--#if expr="-n v('EntInst4Title')" -->
+<tr>
+<td><strong><!--#echo var="EntInst4Title" --></strong><br/>
+<!--#echo var="EntInst4Note" --> <code>[<!--#echo var="EntInst4Path" -->]</code><br/><br/></td>
+<td valign="top"><a class="button" href="<!--#echo var="EntInst4Path" -->"><!--#echo var="EntLinkText" --></a></td>
+</tr>
+<!--#endif-->
+
+<!--#if expr="-n v('EntInst5Title')" -->
+<tr>
+<td><strong><!--#echo var="EntInst5Title" --></strong><br/>
+<!--#echo var="EntInst5Note" --> <code>[<!--#echo var="EntInst5Path" -->]</code><br/><br/></td>
+<td valign="top"><a class="button" href="<!--#echo var="EntInst5Path" -->"><!--#echo var="EntLinkText" --></a></td>
+</tr>
+<!--#endif-->
+
+</table>
+<br/>
+<br/>
+<br/>
+<hr/>
+<div align="right">
+All rights reserved <br/>
+
+</div>
+
+<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+<pre><!--#printenv --> </pre>
+
+</BODY>
+</html>

@@ -1,0 +1,114 @@
+#!/bin/bash
+#       ____  __  ______________
+#      / __ \/ / / /  _/ ___/__ \
+#     / / / / /_/ // / \__ \__/ /
+#    / /_/ / __  // / ___/ / __/
+#   /_____/_/ /_/___//____/____/
+#
+#   Script to deploy a dhis2 instance
+
+###############################################################
+usage() {
+  echo "Usage: $PROG [options] <instance> <container>"
+  echo "  instance: name of the dhis2 instance to create"
+  echo "Options:"
+  echo "  -h, --help       Display this help message"
+  echo "  -n               Do NOT create database for instance"
+}
+
+###############################################################
+
+# main entry point
+
+CREATEDB=true
+echo checking options
+while getopts p:nh opt
+do
+  case $opt in
+    n) CREATEDB=false ;;
+    h) usage;;
+    *) echo "Error: Unknown parameter '$OPTARG'."
+        exit 1;;
+  esac
+done
+
+shift $(($OPTIND - 1))
+
+if [ "$#" -ne 2 ]; then
+  usage
+  exit 1
+fi
+if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+  usage
+  exit 0
+fi
+
+TARGET=$1
+CONTAINER=$2
+
+# check if container exists
+if ! lxc list |grep -w $CONTAINER |grep -wq RUNNING ; 
+then 
+   echo "No such running container $CONTAINER" >>/dev/stderr
+   exit 1
+fi
+
+# is there a tomcat running in it?
+if ! lxc exec tomcat -- ps aux |grep -wq tomcat8; 
+then 
+   echo "no tomcat running in $CONTAINER"
+   exit 1
+fi
+
+# Fail if no target specified
+if [ -z "${TARGET}" ]; then
+  echo "Error: No Dhis2 instance name specified"
+  exit 1
+fi
+echo "You are about to create a Dhis2 instance called '$TARGET'"
+
+###############################################################
+
+#  perform db checks before doing anything
+DBNAME=$TARGET
+
+if $CREATEDB; then
+   if lxc exec postgres -- sudo -u postgres psql -c '\q' $DBNAME >/dev/null 2>&1; then 
+      echo "Database $DBNAME already exists" >> /dev/stderr
+      exit 1
+   fi
+fi
+###############################################################
+
+#  Right, we should be good to go ...
+
+
+if $CREATEDB; then
+  # create the database user with a reasonable password
+  echo "Generating password"
+  PASSWORD=$(openssl rand -base64 20)
+  echo "Creating database role"
+  lxc exec postgres -- sudo -u postgres psql -c "CREATE ROLE $TARGET PASSWORD '$PASSWORD' NOSUPERUSER CREATEDB NOCREATEROLE INHERIT LOGIN;"
+  # Create the database
+  echo "Creating database"
+  lxc exec postgres -- sudo -u postgres psql -c  "CREATE DATABASE $DBNAME OWNER $TARGET ENCODING 'UTF-8' TEMPLATE template0;"
+  lxc exec postgres -- sudo -u postgres psql $DBNAME -c  "CREATE EXTENSION postgis;"
+  HBA_ENTRY="host $DBNAME $DBNAME 192.168.0.3/32  md5"
+  lxc exec postgres -- sh -c "echo $HBA_ENTRY >> /etc/postgresql/10/main/pg_hba.conf"
+fi
+
+echo "Creating dhis.conf"
+cat > "/tmp/dhis.conf" << EOT
+connection.dialect = org.hibernate.dialect.PostgreSQLDialect
+connection.driver_class = org.postgresql.Driver
+connection.url = jdbc:postgresql://postgres:5432/$DBNAME
+connection.username = $TARGET
+connection.password = $PASSWORD
+connection.schema = update
+EOT
+
+lxc file push /tmp/dhis.conf $CONTAINER/opt/dhis2/dhis.conf
+lxc exec $CONTAINER -- chmod 0640  /opt/dhis2/dhis.conf
+lxc exec $CONTAINER -- chown root:tomcat8  /opt/dhis2/dhis.conf
+
+echo done!!

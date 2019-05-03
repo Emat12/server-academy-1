@@ -1,0 +1,65 @@
+# Specify minimum Vagrant version and Vagrant API version
+
+Vagrant.require_version '>= 1.6.0'
+VAGRANTFILE_API_VERSION = '2'
+
+# require some plugins
+
+require 'vagrant-linode'
+require 'vagrant-hostsupdater'
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+  # SSH configuration
+  #config.ssh.username = 'vagrant'
+  config.ssh.private_key_path = '~/.ssh/id_rsa'
+  config.vm.synced_folder('.', '/vagrant', disabled: true)
+
+  # Global Configuration
+   config.vm.provider :linode do |provider, override|
+     override.vm.box = "linode/ubuntu1804"
+     provider.token = 'Er7mWeyatoif5qpXXruhIYPlsWZc7NYDXfGoT1mjHTGRRfZ2XK5Cw7QTwOrbCSn1'
+     provider.distribution = "Ubuntu 18.04"
+     provider.datacenter = "london"
+     provider.kernel = "GRUB 2"
+     #provider.setup = false
+     ## provider.api_key = ENV['LINODE_API_KEY']
+     provider.plan = 'Linode 8GB'
+     #provider.volumes = [
+     #   { label: "sdc", size: 150 }
+     #]
+     provider.xvda_size = '30000'
+     provider.swap_size = '1024'
+     provider.label = 'vagrant-'+Time.new.strftime("%F%T").gsub(/[^0-9]/,'')
+   end
+
+NODE_COUNT = 9
+(1..NODE_COUNT).each do |i|
+    config.vm.define vm_name = "team0#{i}_dar_dhis2_site" do |config|
+      config.vm.provider :linode do |provider|
+        provider.label = vm_name
+        provider.xvda_size = '30000'
+        provider.swap_size = '1024'
+      end
+      config.ssh.username = 'vagrant'
+      config.vm.synced_folder "setup/", "/home/vagrant/setup", type: "rsync"
+      config.vm.provision "shell", path: "setup/system-base-dyndns.sh", args: [ "team0#{i}" ]
+      config.vm.provision "shell", path: "setup/system-base-make-volumes.sh"
+      config.vm.provision "shell", path: "setup/system-base-fix-hosts.sh"
+      config.vm.provision "shell", path: "setup/system-base-root-ssh.sh"
+      config.vm.provision "shell", path: "setup/system-base-make-luks-volume.sh"
+      config.vm.provision "shell", path: "setup/system-base-make-lxd-setup.sh"
+      config.vm.provision "shell", path: "setup/system-base-start-all-lxcs.sh"
+      config.vm.provision "shell", path: "setup/lxcs-ssh-keygens.sh"
+#     config.vm.provision "shell", path: "setup/system-base-stop-2-lxcs.sh"
+      config.vm.provision "shell", path: "setup/lxc-create-proxy.sh"
+      config.vm.provision "shell", path: "setup/system-base-final.sh"
+      config.vm.provision "shell", path: "setup/lxcs-final-setup.sh"
+    end
+end
+
+
+
+
+
+end
