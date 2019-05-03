@@ -13,12 +13,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Global Configuration
    config.vm.provider :linode do |provider, override|
      override.vm.box = "linode/ubuntu1804"
-     provider.token = 'Er7mWeyatoif5qpXXruhIYPlsWZc7NYDXfGoT1mjHTGRRfZ2XK5Cw7QTwOrbCSn1'
      provider.distribution = "Ubuntu 18.04"
      provider.datacenter = "london"
      provider.kernel = "GRUB 2"
      #provider.setup = false
-     ## provider.api_key = ENV['LINODE_API_KEY']
+     provider.api_key = ENV['LINODE_API_KEY']
      provider.plan = 'Linode 8GB'
      provider.xvda_size = '30000'
      provider.swap_size = '1024'
